@@ -1,15 +1,24 @@
-const express = require("express");
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+const productRoutes = require('./routes/productRoutes');
+const userRoutes = require('./routes/userRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+
+dotenv.config();
+
 const app = express();
+app.use(express.json());
 
-app.use(express.json()); // Permitir JSON nas requisições
+// Conexão com MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('🟢 MongoDB conectado com sucesso'))
+  .catch(err => console.error('🔴 Erro ao conectar ao MongoDB:', err));
 
-// Rota inicial
-app.get("/", (req, res) => {
-    res.send("API E-Commerce rodando! 🚀");
-});
+app.use('/api', productRoutes);
+app.use('/api', userRoutes);
+app.use('/api', orderRoutes);
 
-// Definir a porta do servidor
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Servidor rodando na porta ${PORT}`));
